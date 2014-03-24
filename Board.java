@@ -192,7 +192,7 @@ public class Board {
   //
   // Person in charge: Nikhil Rajpal
   public player.Move[] validMoveList(int color) {
-    return new player.Move[1];
+    return new player.Move[2];
   }
   
   // Checks to see if "this" board contains a winning network for the "color", as long as
@@ -248,12 +248,14 @@ public class Board {
   }
   
   public void undoMove(player.Move move, int color) {
-    if (move.moveKind == player.Move.STEP) {
+    if (boardGrid[move.x1][move.y1] == color) {
+      if (move.moveKind == player.Move.STEP) {
+        boardGrid[move.x2][move.y2] = color;
+        setNumChips(color, "+");
+      }
       boardGrid[move.x1][move.y1] = 2;
       setNumChips(color, "-");
     }
-    boardGrid[move.x2][move.y2] = color;
-    setNumChips(color, "+");
   }
   
   public int length() {
@@ -602,6 +604,28 @@ public class Board {
     if (testBoard1.isValidMove(testMove2, 1)) {
       testBoard1.setBoardGrid(testMove2, 1);
     }
+    System.out.println(testBoard1);
+    
+    // Testing undoMove() for add move
+    System.out.println("Testing undoMove() for a move");
+    testMove2 = new player.Move(3, 2);
+    if (testBoard1.isValidMove(testMove2, 0)) {
+      testBoard1.setBoardGrid(testMove2, 0);
+    }
+    System.out.println(testBoard1);
+    System.out.println("Board below should be different than board above");
+    testBoard1.undoMove(testMove2, 0);
+    System.out.println(testBoard1);
+    
+    // Testing undoMove() for step move
+    System.out.println("Testing undoMove() for a move");
+    testMove2 = new player.Move(4, 3, 3, 3);
+    if (testBoard1.isValidMove(testMove2, 1)) {
+      testBoard1.setBoardGrid(testMove2, 1);
+    }
+    System.out.println(testBoard1);
+    System.out.println("Board below should be different than board above");
+    testBoard1.undoMove(testMove2, 1);
     System.out.println(testBoard1);
   }
 }
