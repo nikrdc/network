@@ -1,13 +1,13 @@
                                      GRADER
 
-Name of student running submit:
-Login of student running submit:
+Name of student running submit: Eric Hum
+Login of student running submit: cs61b-ado
 
-Second team member's name:
-Second team member's login:
+Second team member's name: Max Eusterbrock
+Second team member's login: cs61b-fg
 
-Third team member's name (if any):
-Third team member's login:
+Third team member's name (if any): Nikhil Rajpal
+Third team member's login: cs61b-axw
 
 IMPORTANT:  Once you've submitted Project 2 once, the same team member should
 submit always.  If a different teammate must submit, inform cs61b@cory.eecs of
@@ -62,3 +62,188 @@ You will probably need to change some of your design decisions as you go; be
 sure to modify this file to reflect these changes before you submit your
 project.  Your design of classes and interfaces will be worth 10% of your
 grade.
+
+Classes
+Board.java
+Chip.java
+SearchTree.java
+
+Modules
+Networking module - Max
+Board.java
+Board.winningNetwork()
+Chip.java
+Chip.directConnections()
+
+Evaluation Function module - Nik
+Board.java
+Board.evaluator()
+Board.validMoveList()
+
+Minimax module - Eric
+SearchTree.java
+SearchTree.minimax()
+Board.java
+Board.isValidMove()
+Chip.java
+Chip.neighbors()
+
+/* Board.java */
+
+/**
+ * Implementation of the Board that a player is playing on.
+ *
+ **/
+
+public class Board {
+
+  private Player me;
+  private Player opponent;
+  private Chip[][] boardGrid;
+  
+  // Board constructor
+  public Board() {
+    boardGrid = new Chip[8][8];
+  }
+
+  // Checks if Move m is valid with regards to "this" board.
+  // Rules go as follow:
+  //   1)  No chip may be placed in any of the four corners. 
+  //   2)  No chip may be placed in a goal of the opposite color.
+  //   3)  No chip may be placed in a square that is already occupied.
+  //   4)  A player may not have more than two chips in a connected group, whether 
+  //       connected orthogonally or diagonally.
+  //
+  // Parameters:
+  //   m: an instance of the Move class
+  //   color: the color of the player we're seeing if m is a valid move for
+  //
+  // Return Value:
+  //   Returns True is Move m is valid
+  //   Returns False if Move m is invalid
+  //
+  // Other methods that rely on this method:
+  //   validMoveList()
+  //   MachinePlayer.opponentMove()
+  //   MachinePlayer.forceMove()
+  //
+  // Person in charge: Eric Hum
+  public boolean isValidMove(Move m, int color) {
+  }
+
+  
+  // Creates a list of all x and y coordinates that are open to valid moves
+  //
+  // Parameters:
+  //   color: the color of the player we're searching a list of valid moves for
+  //
+  // Return Value:
+  //   An array of all possible Moves
+  //
+  // Other methods that rely on this method:
+  //    minimax.minimax()
+  //    evaluator()
+  //
+  // Person in charge: Nikhil Rajpal
+  public Move[] validMoveList(int color) {
+  }
+  
+  // Checks to see if "this" board contains a winning network for the "color", as long as
+  // it follows the following rules:
+  //    1. All moves are valid
+  //    2. Only 1 Chip in either goal
+  //    3. A proper connection from one goal to the other
+  //    4. At least 6 chips help form the connection
+  //    5. There are no opponent chips in between a straight line between two chips to break the connection
+  //    6. The network does not pass through the same chip twice
+  //    7. A network always passes through each chip while turning a corner (ie changing direction at each chip in network)
+  //
+  // Parameters:
+  //    color: the color of the player we're searching a winning network for
+  //
+  // Return Value:
+  //    Returns True if there does exist a network for a player on "this" board
+  //    Returns False if there is not a network for a player on "this" board
+  //
+  // Other methods that rely on this method:
+  //    evaluator()
+  //    minimax()
+  public boolean winningNetwork(int color) {
+  }
+  
+  // Creates a score for a given "color" based on "this" board
+  //
+  // Parameters:
+  //    color: the color of the player we're evaluating the board for
+  //
+  // Return Value:
+  //    Returns a score, high score if favorable 
+  //
+  // Other methods that rely on this method:
+  //    minimax()
+  //    
+  public int evaluator(int color) {
+  }
+  
+}
+
+
+/* Chip.java */
+
+/** An implementation of the chips placed on the board
+ *
+ *  Person in charge of entire class: Max Eusterbrock
+ */
+public class Chip {
+
+  private int x;
+  private int y;
+  private int color;
+  
+  // Returns an array of Chips that are directly next to "this" Chip
+  public Chip(int x, int y, int color) {
+    this.x = x;
+    this.y = y;
+    this.color = color;
+  
+  // Finds the neighbors of "this" chip
+  //
+  // Parameters:
+  //    none
+  //
+  // Return Value:
+  //    An array of Chips that are directly connected to "this" chip. ie, the neighbors
+  //    are directly adjacent to "this" chip.
+  public Chip[] directConnections() {
+  }
+  
+}
+
+
+/* SearchTree.java */
+
+public class SearchTree {
+
+  // Does a search tree algorithm that finds the best possible move based on the board and the number of searchDepth
+  //
+  // Parameters:
+  //    board: the current board minimax is analyzing
+  //    searchDepth: the number of recursions of minimax
+  //    color: the player that is currently being minimaxed (either CurrentPlayer or Opponent)
+  //    alpha: the score that the  CurrentPlayer knows with certainty it can achieve
+  //    beta: the score that the Opponent is the worst score the Opponent is guarateed to attain
+  //
+  // Return Value:
+  //    Returns the Move that is optimal for the CurrentPlayer given the board and the search depth
+  //
+  // Other methods that rely on this method:
+  //    evaluator:
+  //
+  // Person in charge: Eric Hum
+  public Move minimax(Board board, int searchDepth, int color, int alpha, int beta) {
+  }
+
+}
+
+
+

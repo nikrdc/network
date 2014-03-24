@@ -85,7 +85,7 @@ are two winning black networks.  Observe that the second one crosses itself.
                  -----------------------------------------
                  |    |    |    |    |    |    |    |    | _6
                  -----------------------------------------
-                 |    |    |    |    |    | BB |    |    | _7
+                 |    |    | BB |    |    | BB |    |    | _7
                  -----------------------------------------
                    0_   1_   2_   3_   4_   5_   6_   7_
 
@@ -109,7 +109,7 @@ once.  For that reason the following is not a network.
 A network cannot pass through a chip without turning a corner (i.e. changing
 direction).  Because of the chip in square 42, the following is not a network.
 
-    60 - 42 - 33 - 35 - 55 - 57
+    60 - 42 - 33 - 35 - 25 - 27
 
 Legal Moves
 ===========
