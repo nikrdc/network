@@ -1,5 +1,8 @@
 /* Board.java */
 
+import list.*;
+import player.*;
+
 /**
  * Implementation of the Board that a player is playing on.
  *
@@ -201,7 +204,7 @@ public class Board {
         for (int j = 0; j < length; j++) {
           int[] position = new int[2];
           position[0] = i;
-          position[1] = j;
+          position[1] =  pj;
           if (boardGrid[i][j] == 2) {
           emptySpots.insertBack(position);
           } else if (boardGrid[i][j] == color) {
