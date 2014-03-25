@@ -19,55 +19,58 @@ public class SearchTree {
   //
   // Person in charge: Eric Hum
   public Object[] minimax(Board board, int searchDepth, int originalColor, int currentColor, int alpha, int beta) {
-    if (searchDepth == -1) {
-      Object[] temp = new Object[3];
-      // temp[2] = searchDepth;
-      temp[1] = board.evaluator(currentColor);
-      // temp[0] = new player.Move Move();
-      return temp;
-    }
-    if (board.winningNetwork(currentColor)) {
-      Object[] temp = new Object[3];
-      // temp[2] = searchDepth;
-      temp[1] = board.evaluator(currentColor);
-      // temp[0] = new player.Move Move();
-      return temp;
-    }
-    player.Move[] movesList = board.validMoveList(currentColor);
-    Object[] myBest = new Object[3];
-    Object[] reply;
-    if (currentColor == originalColor) {
-      myBest[1] = alpha;
-    } else {
-      myBest[1] = beta;
-    }
-    myBest[0] = movesList[0];
-    for (player.Move move : movesList) {
-      board.setBoardGrid(move, currentColor);
-      reply = minimax(board, searchDepth-1, originalColor, Math.abs(currentColor-1), alpha, beta);
-      board.undoMove(move, currentColor);
-      if ((currentColor == originalColor) &&
-          (((Integer) reply[1]) > ((Integer) myBest[1])) || 
-          (currentColor == originalColor) &&
-          (((Integer) reply[1] == ((Integer) myBest[1]))) &&
-          (searchDepth > ((Integer) myBest[2]))) {
-        myBest[0] = move;
-        myBest[1] = reply[1];
-        myBest[2] = searchDepth;
-        alpha = ((Integer) reply[1]);
-      } else if ((currentColor != originalColor) &&
-                 (((Integer) reply[1]) < ((Integer) myBest[1]))) {
-        myBest[0] = move;
-        myBest[1] = reply[1];
-        myBest[2] = searchDepth;
-        beta = ((Integer) reply[1]);
+    try {
+      if (searchDepth == -1) {
+        Object[] temp = new Object[3];
+        temp[1] = board.evaluator(currentColor);
+        return temp;
       }
-      if (alpha >= beta) { 
-        return myBest; 
+      if (board.winningNetwork(currentColor)) {
+        Object[] temp = new Object[3];
+        temp[1] = board.evaluator(currentColor);
+        return temp;
       }
+      list.List movesList = board.validMoveList(currentColor);
+      list.ListNode node = movesList.front();
+      Object[] myBest = new Object[3];
+      Object[] reply;
+      if (currentColor == originalColor) {
+        myBest[1] = alpha;
+      } else {
+        myBest[1] = beta;
+      }
+      myBest[0] = ((player.Move) node.item());
+      while (node != null && node.item() != null) {
+        board.setBoardGrid(((player.Move) node.item()), currentColor);
+        reply = minimax(board, searchDepth-1, originalColor, Math.abs(currentColor-1), alpha, beta);
+        board.undoMove(((player.Move) node.item()), currentColor);
+        if ((currentColor == originalColor) &&
+            (((Integer) reply[1]) > ((Integer) myBest[1])) || 
+            (currentColor == originalColor) &&
+            (((Integer) reply[1] == ((Integer) myBest[1]))) &&
+            (searchDepth > ((Integer) myBest[2]))) {
+          myBest[0] = ((player.Move) node.item());
+          myBest[1] = reply[1];
+          myBest[2] = searchDepth;
+          alpha = ((Integer) reply[1]);
+        } else if ((currentColor != originalColor) &&
+                   (((Integer) reply[1]) < ((Integer) myBest[1]))) {
+          myBest[0] = ((player.Move) node.item());
+          myBest[1] = reply[1];
+          myBest[2] = searchDepth;
+          beta = ((Integer) reply[1]);
+        }
+        if (alpha >= beta) { 
+          return myBest; 
+        }
+        node = node.next();
+      }
+      return myBest;
+    } catch (list.InvalidNodeException e) {
+      return new Object[1];
     }
-    return myBest;
   }
+    
   
   public static void main(String[] args) {
     // Testing minimax

@@ -73,6 +73,9 @@ public class Board {
       }
     }
     if (m.y1 == 0 || m.y1 == length()-1) { // checks if a chip is in opponent's goals for color 1
+      if (m.x1 == 0 || m.x1 == length()-1) { // checks corners
+        return false;
+      }
       if (color == 1) {
         return false;
       }
@@ -201,16 +204,16 @@ public class Board {
         DList emptySpots = new DList();
         DList colorSpots = new DList();
         for (int i = 0; i < length; i++) {
-        for (int j = 0; j < length; j++) {
-          int[] position = new int[2];
-          position[0] = i;
-          position[1] =  pj;
-          if (boardGrid[i][j] == 2) {
-          emptySpots.insertBack(position);
-          } else if (boardGrid[i][j] == color) {
-          colorSpots.insertBack(position);
+          for (int j = 0; j < length; j++) {
+            int[] position = new int[2];
+            position[0] = i;
+            position[1] = j;
+            if (boardGrid[i][j] == 2) {
+              emptySpots.insertBack(position);
+            } else if (boardGrid[i][j] == color) {
+              colorSpots.insertBack(position);
+            }
           }
-        }
         }
         DListNode colorStart = (DListNode) colorSpots.front();
         for (int k = 0; k < colorSpots.length(); k++) {
@@ -218,7 +221,7 @@ public class Board {
           for (int t = 0; t < emptySpots.length(); t++) {
             int[] startPosition = (int[]) colorStart.item();
             int[] endPosition = (int[]) emptyEnd.item();
-            Move potentialStep = new Move(endPosition[0], endPosition[1], startPosition[0], startPosition[1]);
+            Move potentialStep = new Move(endPosition[1], endPosition[0], startPosition[1], startPosition[0]);
             if (isValidMove(potentialStep, color)) {
               validMoves.insertBack(potentialStep);
             }
@@ -229,7 +232,7 @@ public class Board {
       } else {
         for (int i = 0; i < length; i++) {
           for (int j = 0; j < length; j++) {
-            Move potentialAdd = new Move(i, j);
+            Move potentialAdd = new Move(j, i);
             if (isValidMove(potentialAdd, color)) {
               validMoves.insertBack(potentialAdd);
             }
@@ -375,6 +378,28 @@ public class Board {
     }
     if (testBoard1.isValidMove(testMove6, 1)) {
       testBoard1.setBoardGrid(testMove6, 1);
+    }
+    System.out.println(testBoard1);
+    
+    // Testing isValidMove() for corners
+    System.out.println("Testing isValidMove() for color 0 to (0, 0), (7, 0), (0, 7), (7, 7)");
+    System.out.println("Should not change board");
+    System.out.println("Due to Rule 1");
+    testMove3 = new player.Move(0, 0);
+    testMove4 = new player.Move(7, 0);
+    testMove5 = new player.Move(0, 7);
+    testMove6 = new player.Move(7, 7);
+    if (testBoard1.isValidMove(testMove3, 0)) {
+      testBoard1.setBoardGrid(testMove3, 0);
+    }
+    if (testBoard1.isValidMove(testMove4, 0)) {
+      testBoard1.setBoardGrid(testMove4, 0);
+    }
+    if (testBoard1.isValidMove(testMove5, 0)) {
+      testBoard1.setBoardGrid(testMove5, 0);
+    }
+    if (testBoard1.isValidMove(testMove6, 0)) {
+      testBoard1.setBoardGrid(testMove6, 0);
     }
     System.out.println(testBoard1);
     
