@@ -178,21 +178,65 @@ public class Board {
   }
 
   
-  // Creates a list of all x and y coordinates that are open to valid moves
+  // Creates a list of all valid moves
   //
   // Parameters:
   //   color: the color of the player we're searching a list of valid moves for
   //
   // Return Value:
-  //   An array of all possible Moves
+  //   A DList of all valid Moves
   //
   // Other methods that rely on this method:
   //    minimax.minimax()
   //    evaluator()
   //
   // Person in charge: Nikhil Rajpal
-  public player.Move[] validMoveList(int color) {
-    return new player.Move[2];
+  public DList validMoveList(int color) {
+    DList validMoves = new DList();
+    try {
+      if (getNumChips(color) >= 10) {
+        DList emptySpots = new DList();
+        DList colorSpots = new DList();
+        for (int i = 0; i < length; i++) {
+        for (int j = 0; j < length; j++) {
+          int[] position = new int[2];
+          position[0] = i;
+          position[1] = j;
+          if (boardGrid[i][j] == 2) {
+          emptySpots.insertBack(position);
+          } else if (boardGrid[i][j] == color) {
+          colorSpots.insertBack(position);
+          }
+        }
+        }
+        DListNode colorStart = (DListNode) colorSpots.front();
+        for (int k = 0; k < colorSpots.length(); k++) {
+          DListNode emptyEnd = (DListNode) emptySpots.front();
+          for (int t = 0; t < emptySpots.length(); t++) {
+            int[] startPosition = (int[]) colorStart.item();
+            int[] endPosition = (int[]) emptyEnd.item();
+            Move potentialStep = new Move(endPosition[0], endPosition[1], startPosition[0], startPosition[1]);
+            if (isValidMove(potentialStep, color)) {
+              validMoves.insertBack(potentialStep);
+            }
+            emptyEnd = (DListNode) emptyEnd.next();
+          }
+          colorStart = (DListNode) colorStart.next();
+        }
+      } else {
+        for (int i = 0; i < length; i++) {
+          for (int j = 0; j < length; j++) {
+            Move potentialAdd = new Move(i, j);
+            if (isValidMove(potentialAdd, color)) {
+              validMoves.insertBack(potentialAdd);
+            }
+          }
+        }
+      }
+    } catch (InvalidNodeException e) {
+      System.out.println(e + " at validMoveList");
+    }
+    return validMoves;
   }
   
   // Checks to see if "this" board contains a winning network for the "color", as long as
