@@ -816,41 +816,6 @@ public class Board {
     System.out.println("Board below should be different than board above");
     testBoard1.undoMove(testMove2, 1);
     System.out.println(testBoard1);
-
-    // Testing validMoveList()
-    System.out.println("Testing validMoveList() on empty board for player 1");
-    Board nikBoard1 = new Board();
-	DList nikList1 = nikBoard1.validMoveList(1);
-	System.out.println(nikList1);
-
-	System.out.println("Testing validMoveList() on a board with 10 player 1 pieces");
-	Move nikMove1 = new Move(1, 1);
-	Move nikMove2 = new Move(2, 2);
-	Move nikMove3 = new Move(3, 3);
-	Move nikMove4 = new Move(4, 4);
-	Move nikMove5 = new Move(5, 5);
-	Move nikMove6 = new Move(6, 6);
-	Move nikMove7 = new Move(1, 2);
-	Move nikMove8 = new Move(1, 3);
-	Move nikMove9 = new Move(1, 4);
-	Move nikMove10 = new Move(1, 5);
-	nikBoard1.setBoardGrid(nikMove1, 1);
-	nikBoard1.setBoardGrid(nikMove2, 1);
-	nikBoard1.setBoardGrid(nikMove3, 1);
-	nikBoard1.setBoardGrid(nikMove4, 1);
-	nikBoard1.setBoardGrid(nikMove5, 1);
-	nikBoard1.setBoardGrid(nikMove6, 1);
-	nikBoard1.setBoardGrid(nikMove7, 1);
-	nikBoard1.setBoardGrid(nikMove8, 1);
-	nikBoard1.setBoardGrid(nikMove9, 1);
-	nikBoard1.setBoardGrid(nikMove10, 1);
-	DList nikList2 = nikBoard1.validMoveList(1);
-	System.out.println("Here is the board:");
-	System.out.println(nikBoard1);
-	System.out.println("Here is the validMoveList for player 1:");
-	System.out.println(nikList2);
-	System.out.println("Here are the number of available moves for player 1:");
-	System.out.println(nikList2.length());
   }
 }
 
