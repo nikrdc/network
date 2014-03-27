@@ -452,10 +452,10 @@ public class Board {
     int score = 0;
     if (winningNetwork(color)) { // winning board is worth 100 points
       score = 100;
-    } else if (winningNetwork(Math.abs(currentColor-1))) { 
+    } else if (winningNetwork(Math.abs(color-1))) { 
       score = -100;
     } else {
-      score = (numLinks(color) * 10) - (numlinks(Math.abs(currentColor-1)) * 10) // each link worth 10 points
+      score = (numLinks(color) * 10) - (numLinks(Math.abs(color-1)) * 10); // each link worth 10 points
     }
   }
 
@@ -474,11 +474,11 @@ public class Board {
     }
     DListNode currentSpot = (DListNode) colorSpots.front();
     for (int k = 0; k < colorSpots.length(); k++) {
-      int[] position = currentSpot.item();
+      int[] position = (int[]) currentSpot.item();
       for (int x = -1; x <= 1; x++) {
         for (int y = -1; y <= 1; y++) {
-          int[] nearestColor = (nearestPiece(position[0], position[1], x, y)
-          if (nearestColor != null) {
+          if (nearestPiece(position[0], position[1], x, y) != null) {
+          	int[] nearestColor = nearestPiece(position[0], position[1], x, y);
             int f = nearestColor[0];
             int g = nearestColor[1];
             if (boardGrid[f][g] == color) {
@@ -487,7 +487,7 @@ public class Board {
           }
         }
       }
-      currentSpot = currentSpot.next();
+      currentSpot = (DListNode) currentSpot.next();
     }
     links /= 2; // account for duplicate links
     return links;
