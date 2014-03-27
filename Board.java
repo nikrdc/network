@@ -267,27 +267,33 @@ public class Board {
   //    minimax()
   // Person in charge: Max Eusterbrock
   public boolean winningNetwork(int color) {
-    for (int i = 1; i<= 6; i++){
-      if (boardGrid[0][i] == 1){ // start traversal for white chips
-        int[][] accum = {{0, i}};
-        for (int y = - 1; y <= 1; y++){
-          int[] whiteVector = {1, y};
-          boolean result = networkHelp(accum[0], nearestPiece(0, i, 1, y), whiteVector, accum);
-          if (result == false){
-            continue;
-          } else {
-            return true;
+    if (color == 1) {
+      for (int i = 1; i<= 6; i++){
+        if (boardGrid[0][i] == 1){//start traversal for white chips
+          int[][] accum = {{0, i}};
+          for (int y = - 1; y <= 1; y++){
+            int[] whiteVector = {1, y};
+            boolean result = networkHelp(accum[0], nearestPiece(0, i, 1, y), whiteVector, accum);
+            if (result == false){
+              continue;
+            } else {
+              return true;
+            }
           }
         }
-      } if (boardGrid[i][0] == 0) { // start traversal for black chips
-        int[][] accum = {{0, i}};
-        for (int x = - 1; x <= 1; x++){
-          int[] blackVector = {x, 1};
-          boolean result = networkHelp(accum[0], nearestPiece(i, 0, x, 1), blackVector, accum);
-          if (result == false){
-            continue;
-          } else {
-            return true;
+      }
+    } else if (color == 0) {
+      for (int i = 1; i<= 6; i++){
+        if (boardGrid[i][0] == 0) {//start traversal for black chips
+          int[][] accum = {{i, 0}};
+          for (int x = - 1; x <= 1; x++){
+            int[] blackVector = {x, 1};
+            boolean result = networkHelp(accum[0], nearestPiece(i, 0, x, 1), blackVector, accum);
+            if (result == false){
+              continue;
+            } else {
+              return true;
+            }
           }
         }
       }
@@ -295,57 +301,75 @@ public class Board {
     return false;
   }
 
+  // Helps to see if "this" board contains a winning network for the "color", as long as
+  // it follows the following rules:
+  //
+  // Parameters:
+  //    int[] prev: the coordinates [x, y] of the last piece visited
+  //    int[] curr: the coordinates [x, y] of the current piece being visited
+  //    int[] lastVector: the vector direction [x, y] from which curr was reached from prev
+  //    int[][] accumNetwork: The accumulation of coordinates [x, y]  for each piece
+  //                     already having been visited in the current search (to prevent repeat pieces).
+  // Return Value:
+  //    Returns True if there does exist a network for a player on "this" board
+  //    Returns False if there is not a network for a player on "this" board
+  //
+  // Other methods that rely on this method:
+  //    winningNetwork()
+  // Person in charge: Max Eusterbrock
   private boolean networkHelp(int[] prev, int[] curr, int[] lastVector, int[][] accumNetwork){
+
+    if (curr == null){//Piece is off the board so the network terminates
+      return false;
+    }  
+
     int prevX = prev[0];
     int prevY = prev[1];
     int currX = curr[0];
     int currY = curr[1];
     int prevColor = boardGrid[prevX][prevY];
 
-    for(int[] each : accumNetwork) {
-      if (each.equals(curr)) { // Piece has already been visited in current search, so network terminates
+    for(int[] each: accumNetwork){
+      if (arrayEquals(each, curr)){//Piece has already been visited in current search, so network terminates
         return false;
       }
     }
-    
-    if (curr == null){ // Piece is off the board so the network terminates
-      return false;
 
-    } else if (boardGrid[prevX][prevY] != boardGrid[currX][currY]) { // This piece is a different color so network terminates
+    if (boardGrid[prevX][prevY] != boardGrid[currX][currY]){//This piece is a different color so network terminates
       return false;
 
     } else {
-      int[][] currAccum = new int[accumNetwork.length + 1][2]; // creates new array to extend the network by the newest piece
-      for (int i = 0; i < accumNetwork.length; i++) { // sets old network equal to new network with intention of adding the newest piece
+      int[][] currAccum = new int[accumNetwork.length + 1][2];//creates new array to extend the network by the newest piece
+      for (int i = 0; i < accumNetwork.length; i++){//sets old network equal to new network with intention of adding the newest piece
         currAccum[i] = accumNetwork[i];
       }
-      currAccum[currAccum.length - 1] = curr; // sets last element as the newest piece
-      if (currX == 7 || currY == 7) { // newest piece in goal area
-        if (currAccum.length >= 6) { // network of 6 or more pieces
+      currAccum[currAccum.length - 1] = curr; //sets last element as the newest piece
+      if (currX == 7 || currY == 7){//newest piece in goal area
+        if (currAccum.length >= 6){//network of 6 or more pieces
           return true;
-        } else { // length < 6 so traversal terminates
+        } else {//length < 6 so traversal terminates
           return false;
         }
 
       } else {
         int lastX = lastVector[0];
         int lastY = lastVector[1];
-        for (int x = -1; x <= 1; x++) {
-          for (int y = -1; y <= 1; y++) { // traversing in all 8 directions
-            if (x == lastX && y == lastY) { // ensures a corner is turned
+        for (int x = -1; x <= 1; x++){
+          for (int y = -1; y <= 1; y++){//traversing in all 8 directions
+            if (x == lastX && y == lastY){//ensures a corner is turned
               continue;
-            } else if (-x == lastX && -y == lastY) { // ensures traversal doesn't return to previous piece
+            } else if (-x == lastX && -y == lastY){//ensures traversal doesn't return to previous piece
               continue;
-            } else if (x == 0 && y == 0) { // ensures traversal moves off current piece
+            } else if (x == 0 && y == 0){//ensures traversal moves off current piece
               continue;
             } else {
               int[] next = nearestPiece(currX, currY, x, y);
               int[] currVector = {x, y};
-              if (next == null) { // traversal falls off board
+              if (next == null){//traversal falls off board
                 continue;
               } else {
-                boolean result = networkHelp(curr, next, currVector, currAccum); // !!!!!!!!!
-                if (result == false) {
+                boolean result = networkHelp(curr, next, currVector, currAccum);
+                if (result == false){
                   continue;
                 } else {
                   return true;
@@ -373,23 +397,47 @@ public class Board {
   //
   // Other methods that rely on this method:
   //    winningNetwork(), networkHelp()
+  // Person in charge: Max Eusterbrock
   private int[] nearestPiece(int x, int y, int i, int j){
     int k = x + i;
     int l = y + j;
-    if(k > 7 || l > 7 || k < 0 || l < 0) { // traversed off the board
+    if(k > 7 || l > 7 || k < 0 || l < 0){//traversed off the board
       return null;
-    } else if (boardGrid[k][l] != 2) { // returns found piece coordinate if square not empty
+    } else if (boardGrid[k][l] != 2){//returns found piece coordinate if square not empty
       int[] coords = {k, l};
       return coords;
-    } else { // if square empty, keeps traversing
+    } else {// if square empty, keeps traversing
       return nearestPiece(k, l, i, j);
     }
   }
+  // Checks to see whether or not two integer arrays contain the same elements.
+  //
+  // Parameters:
+  //    int[] one: the first array to be compared
+  //    int[] two: the the second array to be compared
+  // 
+  //
+  // Return Value:
+  //    Returns a boolean value
+  //    Returns true if the contents of the array are the equivalent, false if they are not.
+  //
+  // Other methods that rely on this method:
+  //   networkHelp()
+  // Person in charge: Max Eusterbrock
+  private boolean arrayEquals(int[] one, int[] two){
+    if (one.length != two.length){
+      return false;
+    } else {
+      for (int i = 0; i < one.length; i++){
+        if (one[i] != two[i]){
+          return false;
+        }
+      }
+      return true;
+    }
+  }
   
-
   // Creates a score for a given "color" based on "this" board
-  // The score is composed of the following values:
-  //				
   //
   // Parameters:
   //    color: the color of the player we're evaluating the board for
@@ -405,16 +453,16 @@ public class Board {
     if (winningNetwork(color)) { // winning board is worth 100 points
       score = 100;
     } else if (winningNetwork(Math.abs(currentColor-1))) { 
-    	score = -100;
+      score = -100;
     } else {
- 			score = (numLinks(color) * 10) - (numlinks(Math.abs(currentColor-1)) * 10) // each link worth 10 points
+      score = (numLinks(color) * 10) - (numlinks(Math.abs(currentColor-1)) * 10) // each link worth 10 points
     }
   }
 
   private int numLinks(int color) {
-  	int links = 0;
-  	DList colorSpots = new DList();
-  	for (int i = 0; i < length; i++) {
+    int links = 0;
+    DList colorSpots = new DList();
+    for (int i = 0; i < length; i++) {
       for (int j = 0; j < length; j++) {
         int[] position = new int[2];
         position[0] = i;
@@ -426,20 +474,20 @@ public class Board {
     }
     DListNode currentSpot = (DListNode) colorSpots.front();
     for (int k = 0; k < colorSpots.length(); k++) {
-    	int[] position = currentSpot.item();
-    	for (int x = -1; x <= 1; x++) {
-    		for (int y = -1; y <= 1; y++) {
-    			int[] nearestColor = (nearestPiece(position[0], position[1], x, y)
-    			if (nearestColor != null) {
-    				int f = nearestColor[0];
-    				int g = nearestColor[1];
-    				if (boardGrid[f][g] == color) {
-    					links += 1;
-    				}
-    			}
-    		}
-    	}
-    	currentSpot = currentSpot.next();
+      int[] position = currentSpot.item();
+      for (int x = -1; x <= 1; x++) {
+        for (int y = -1; y <= 1; y++) {
+          int[] nearestColor = (nearestPiece(position[0], position[1], x, y)
+          if (nearestColor != null) {
+            int f = nearestColor[0];
+            int g = nearestColor[1];
+            if (boardGrid[f][g] == color) {
+              links += 1;
+            }
+          }
+        }
+      }
+      currentSpot = currentSpot.next();
     }
     links /= 2; // account for duplicate links
     return links;
@@ -860,6 +908,89 @@ public class Board {
     System.out.println("Board below should be different than board above");
     testBoard1.undoMove(testMove2, 1);
     System.out.println(testBoard1);
+
+    System.out.println("#################################\nTesting winningNetwork(), nearestPiece()\n#################################\n");
+    Board testBoard1w = new Board();
+    player.Move testMove1 = new player.Move(0, 1);
+    testBoard1w.setBoardGrid(testMove1, 1);
+    player.Move testMove2 = new player.Move(1, 2);
+    testBoard1w.setBoardGrid(testMove2, 1);
+
+    int[] newPiece = testBoard1w.nearestPiece(0, 1, 1, 1);
+    System.out.println("Testing nearestPiece on (0, 1) in vector (1, 1): should be (1, 2)");
+    System.out.println("it is : " + "(" + newPiece[0] + " ," + newPiece[1] +") ");
+    System.out.println();
+
+    player.Move testMove3 = new player.Move(2, 1);
+    testBoard1w.setBoardGrid(testMove3, 1);
+
+    int[] newPiece1 = testBoard1w.nearestPiece(0, 1, 1, 0);
+    System.out.println("Testing nearestPiece on (0, 1) in vector (1, 0): Should be (2, 1)");
+    System.out.println("it is : " + "(" + newPiece1[0] + " ," + newPiece1[1] +") ");
+    System.out.println();
+
+
+    player.Move testMove4 = new player.Move(4, 3);
+    testBoard1w.setBoardGrid(testMove4, 1);
+    player.Move testMove5 = new player.Move(5, 2);
+    testBoard1w.setBoardGrid(testMove5, 1);
+    player.Move testMove6 = new player.Move(7, 2);
+    testBoard1w.setBoardGrid(testMove6, 1);
+
+    int[] newPiece2 = testBoard1w.nearestPiece(1, 2, -1, 1);
+    System.out.println("Testing nearestPiece on (1, 2) in vector (-1, 1): Should be null");
+    System.out.println("it is : " + "(" + newPiece2 + " ," + newPiece2 +") ");
+    System.out.println(testBoard1w);
+    System.out.println();
+
+    int[] newPiece3 = testBoard1w.nearestPiece(2, 1, 1, 1);
+    System.out.println("Testing nearestPiece on (2, 1) in vector (1, 1): Should be (4, 3)");
+    System.out.println("it is : " + "(" + newPiece3[0] + " ," + newPiece3[1] +") ");
+    System.out.println();
+
+    System.out.println("Testing Winning Network 1 should be true:");
+    boolean testWin1 = testBoard1w.winningNetwork(1);
+    if (testWin1 == true) {
+      System.out.println("it is");
+    } else {
+      System.out.println("it is not");
+    }
+    System.out.println();
+
+    player.Move testMove7 = new player.Move(6, 2);
+    testBoard1w.setBoardGrid(testMove7, 0);
+
+    System.out.println(testBoard1w);
+    System.out.println("Testing Winning Network 1 should be false:");
+    boolean testWin2 = testBoard1w.winningNetwork(1);
+    if (testWin2 == false) {
+      System.out.println("it is");
+    } else {
+      System.out.println("it is not");
+    }
+    System.out.println();
+
+    player.Move testMove8 = new player.Move(7, 4);
+    testBoard1w.setBoardGrid(testMove8, 1);
+    System.out.println(testBoard1w);
+    System.out.println("Testing Winning Network 1 should be true:");
+    boolean testWin3 = testBoard1w.winningNetwork(1);
+    if (testWin3 == true) {
+      System.out.println("it is");
+    } else {
+      System.out.println("it is not");
+    }
+    System.out.println();
+
+    System.out.println(testBoard1w);
+    System.out.println("Testing Winning Network 0 should be false:");
+    boolean testWin4 = testBoard1w.winningNetwork(0);
+    if (testWin4 == false) {
+      System.out.println("it is");
+    } else {
+      System.out.println("it is not");
+    }
+    System.out.println();
   }
 }
 
