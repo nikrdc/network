@@ -456,7 +456,34 @@ public class Board {
       score = -100;
     } else {
       score = (numLinks(color) * 10) - (numLinks(Math.abs(color-1)) * 10); // each link worth 10 points
+      boolean firstGoal = false;
+      boolean secondGoal = false;
+      if (color == 0) {
+        for (int m = 1; m < (length - 1); m++) {
+          if (boardGrid[m][0] == color) {
+            firstGoal = true;
+          }
+          if (boardGrid[m][7] == color) {
+            secondGoal = true;
+          }
+        }
+      } else if (color == 1) {
+        for (int m = 1; m < (length - 1); m++) {
+          if (boardGrid[0][m] == color) {
+            firstGoal = true;
+          }
+          if (boardGrid[7][m] == color) {
+            secondGoal = true;
+          }
+        }       
+      }
+      if (firstGoal) {
+        score += 5;
+      } if (secondGoal) {
+        score += 5;
+      }
     }
+    return score;
   }
 
   private int numLinks(int color) {
