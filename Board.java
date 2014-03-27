@@ -488,33 +488,37 @@ public class Board {
 
   private int numLinks(int color) {
     int links = 0;
-    DList colorSpots = new DList();
-    for (int i = 0; i < length; i++) {
-      for (int j = 0; j < length; j++) {
-        int[] position = new int[2];
-        position[0] = i;
-        position[1] = j;
-        if (boardGrid[i][j] == color) {
-          colorSpots.insertBack(position);
-        }
-      }
-    }
-    DListNode currentSpot = (DListNode) colorSpots.front();
-    for (int k = 0; k < colorSpots.length(); k++) {
-      int[] position = (int[]) currentSpot.item();
-      for (int x = -1; x <= 1; x++) {
-        for (int y = -1; y <= 1; y++) {
-          if (nearestPiece(position[0], position[1], x, y) != null) {
-          	int[] nearestColor = nearestPiece(position[0], position[1], x, y);
-            int f = nearestColor[0];
-            int g = nearestColor[1];
-            if (boardGrid[f][g] == color) {
-              links += 1;
-            }
+    try {
+      DList colorSpots = new DList();
+      for (int i = 0; i < length; i++) {
+        for (int j = 0; j < length; j++) {
+          int[] position = new int[2];
+          position[0] = i;
+          position[1] = j;
+          if (boardGrid[i][j] == color) {
+            colorSpots.insertBack(position);
           }
         }
       }
-      currentSpot = (DListNode) currentSpot.next();
+      DListNode currentSpot = (DListNode) colorSpots.front();
+      for (int k = 0; k < colorSpots.length(); k++) {
+        int[] position = (int[]) currentSpot.item();
+        for (int x = -1; x <= 1; x++) {
+          for (int y = -1; y <= 1; y++) {
+            if (nearestPiece(position[0], position[1], x, y) != null) {
+            	int[] nearestColor = nearestPiece(position[0], position[1], x, y);
+              int f = nearestColor[0];
+              int g = nearestColor[1];
+              if (boardGrid[f][g] == color) {
+                links += 1;
+              }
+            }
+          }
+        }
+        currentSpot = (DListNode) currentSpot.next();
+      }
+    } catch (InvalidNodeException e) {
+      System.out.println(e + " at numLinks");
     }
     links /= 2; // account for duplicate links
     return links;
@@ -938,18 +942,18 @@ public class Board {
 
     System.out.println("#################################\nTesting winningNetwork(), nearestPiece()\n#################################\n");
     Board testBoard1w = new Board();
-    player.Move testMove1 = new player.Move(0, 1);
-    testBoard1w.setBoardGrid(testMove1, 1);
-    player.Move testMove2 = new player.Move(1, 2);
-    testBoard1w.setBoardGrid(testMove2, 1);
+    player.Move maxTestMove1 = new player.Move(0, 1);
+    testBoard1w.setBoardGrid(maxTestMove1, 1);
+    player.Move maxTestMove2 = new player.Move(1, 2);
+    testBoard1w.setBoardGrid(maxTestMove2, 1);
 
     int[] newPiece = testBoard1w.nearestPiece(0, 1, 1, 1);
     System.out.println("Testing nearestPiece on (0, 1) in vector (1, 1): should be (1, 2)");
     System.out.println("it is : " + "(" + newPiece[0] + " ," + newPiece[1] +") ");
     System.out.println();
 
-    player.Move testMove3 = new player.Move(2, 1);
-    testBoard1w.setBoardGrid(testMove3, 1);
+    player.Move maxTestMove3 = new player.Move(2, 1);
+    testBoard1w.setBoardGrid(maxTestMove3, 1);
 
     int[] newPiece1 = testBoard1w.nearestPiece(0, 1, 1, 0);
     System.out.println("Testing nearestPiece on (0, 1) in vector (1, 0): Should be (2, 1)");
@@ -957,12 +961,12 @@ public class Board {
     System.out.println();
 
 
-    player.Move testMove4 = new player.Move(4, 3);
-    testBoard1w.setBoardGrid(testMove4, 1);
-    player.Move testMove5 = new player.Move(5, 2);
-    testBoard1w.setBoardGrid(testMove5, 1);
-    player.Move testMove6 = new player.Move(7, 2);
-    testBoard1w.setBoardGrid(testMove6, 1);
+    player.Move maxTestMove4 = new player.Move(4, 3);
+    testBoard1w.setBoardGrid(maxTestMove4, 1);
+    player.Move maxTestMove5 = new player.Move(5, 2);
+    testBoard1w.setBoardGrid(maxTestMove5, 1);
+    player.Move maxTestMove6 = new player.Move(7, 2);
+    testBoard1w.setBoardGrid(maxTestMove6, 1);
 
     int[] newPiece2 = testBoard1w.nearestPiece(1, 2, -1, 1);
     System.out.println("Testing nearestPiece on (1, 2) in vector (-1, 1): Should be null");
