@@ -268,7 +268,7 @@ public class Board {
   // Person in charge: Max Eusterbrock
   public boolean winningNetwork(int color) {
     for (int i = 1; i<= 6; i++){
-      if (boardGrid[0][i] == 1){//start traversal for white chips
+      if (boardGrid[0][i] == 1){ // start traversal for white chips
         int[][] accum = {{0, i}};
         for (int y = - 1; y <= 1; y++){
           int[] whiteVector = {1, y};
@@ -279,7 +279,7 @@ public class Board {
             return true;
           }
         }
-      } if (boardGrid[i][0] == 0) {//start traversal for black chips
+      } if (boardGrid[i][0] == 0) { // start traversal for black chips
         int[][] accum = {{0, i}};
         for (int x = - 1; x <= 1; x++){
           int[] blackVector = {x, 1};
@@ -302,50 +302,50 @@ public class Board {
     int currY = curr[1];
     int prevColor = boardGrid[prevX][prevY];
 
-    for(int[] each : accumNetwork){
-      if (each.equals(curr)){//Piece has already been visited in current search, so network terminates
+    for(int[] each : accumNetwork) {
+      if (each.equals(curr)) { // Piece has already been visited in current search, so network terminates
         return false;
       }
     }
     
-    if (curr == null){//Piece is off the board so the network terminates
+    if (curr == null){ // Piece is off the board so the network terminates
       return false;
 
-    } else if (boardGrid[prevX][prevY] != boardGrid[currX][currY]){//This piece is a different color so network terminates
+    } else if (boardGrid[prevX][prevY] != boardGrid[currX][currY]) { // This piece is a different color so network terminates
       return false;
 
     } else {
-      int[][] currAccum = new int[accumNetwork.length + 1][2];//creates new array to extend the network by the newest piece
-      for (int i = 0; i < accumNetwork.length; i++){//sets old network equal to new network with intention of adding the newest piece
+      int[][] currAccum = new int[accumNetwork.length + 1][2]; // creates new array to extend the network by the newest piece
+      for (int i = 0; i < accumNetwork.length; i++) { // sets old network equal to new network with intention of adding the newest piece
         currAccum[i] = accumNetwork[i];
       }
-      currAccum[currAccum.length - 1] = curr; //sets last element as the newest piece
-      if (currX == 7 || currY == 7){//newest piece in goal area
-        if (currAccum.length >= 6){//network of 6 or more pieces
+      currAccum[currAccum.length - 1] = curr; // sets last element as the newest piece
+      if (currX == 7 || currY == 7) { // newest piece in goal area
+        if (currAccum.length >= 6) { // network of 6 or more pieces
           return true;
-        } else {//length < 6 so traversal terminates
+        } else { // length < 6 so traversal terminates
           return false;
         }
 
       } else {
         int lastX = lastVector[0];
         int lastY = lastVector[1];
-        for (int x = -1; x <= 1; x++){
-          for (int y = -1; y <= 1; y++){//traversing in all 8 directions
-            if (x == lastX && y == lastY){//ensures a corner is turned
+        for (int x = -1; x <= 1; x++) {
+          for (int y = -1; y <= 1; y++) { // traversing in all 8 directions
+            if (x == lastX && y == lastY) { // ensures a corner is turned
               continue;
-            } else if (-x == lastX && -y == lastY){//ensures traversal doesn't return to previous piece
+            } else if (-x == lastX && -y == lastY) { // ensures traversal doesn't return to previous piece
               continue;
-            } else if (x == 0 && y == 0){//ensures traversal moves off current piece
+            } else if (x == 0 && y == 0) { // ensures traversal moves off current piece
               continue;
             } else {
               int[] next = nearestPiece(currX, currY, x, y);
               int[] currVector = {x, y};
-              if (next == null){//traversal falls off board
+              if (next == null) { // traversal falls off board
                 continue;
               } else {
-                boolean result = networkHelp(curr, next, currVector, currAccum);//!!!!!!!!!
-                if (result == false){
+                boolean result = networkHelp(curr, next, currVector, currAccum); // !!!!!!!!!
+                if (result == false) {
                   continue;
                 } else {
                   return true;
@@ -376,17 +376,20 @@ public class Board {
   private int[] nearestPiece(int x, int y, int i, int j){
     int k = x + i;
     int l = y + j;
-    if(k > 7 || l > 7 || k < 0 || l < 0){//traversed off the board
+    if(k > 7 || l > 7 || k < 0 || l < 0) { // traversed off the board
       return null;
-    } else if (boardGrid[k][l] != 2){//returns found piece coordinate if square not empty
+    } else if (boardGrid[k][l] != 2) { // returns found piece coordinate if square not empty
       int[] coords = {k, l};
       return coords;
-    } else {// if square empty, keeps traversing
+    } else { // if square empty, keeps traversing
       return nearestPiece(k, l, i, j);
     }
   }
   
+
   // Creates a score for a given "color" based on "this" board
+  // The score is composed of the following values:
+  //				
   //
   // Parameters:
   //    color: the color of the player we're evaluating the board for
@@ -398,7 +401,48 @@ public class Board {
   //    minimax()
   //    
   public int evaluator(int color) {
-    return 0;
+    int score = 0;
+    if (winningNetwork(color)) { // winning board is worth 100 points
+      score = 100;
+    } else if (winningNetwork(Math.abs(currentColor-1))) { 
+    	score = -100;
+    } else {
+ 			score = (numLinks(color) * 10) - (numlinks(Math.abs(currentColor-1)) * 10) // each link worth 10 points
+    }
+  }
+
+  private int numLinks(int color) {
+  	int links = 0;
+  	DList colorSpots = new DList();
+  	for (int i = 0; i < length; i++) {
+      for (int j = 0; j < length; j++) {
+        int[] position = new int[2];
+        position[0] = i;
+        position[1] = j;
+        if (boardGrid[i][j] == color) {
+          colorSpots.insertBack(position);
+        }
+      }
+    }
+    DListNode currentSpot = (DListNode) colorSpots.front();
+    for (int k = 0; k < colorSpots.length(); k++) {
+    	int[] position = currentSpot.item();
+    	for (int x = -1; x <= 1; x++) {
+    		for (int y = -1; y <= 1; y++) {
+    			int[] nearestColor = (nearestPiece(position[0], position[1], x, y)
+    			if (nearestColor != null) {
+    				int f = nearestColor[0];
+    				int g = nearestColor[1];
+    				if (boardGrid[f][g] == color) {
+    					links += 1;
+    				}
+    			}
+    		}
+    	}
+    	currentSpot = currentSpot.next();
+    }
+    links /= 2; // account for duplicate links
+    return links;
   }
   
   public int[][] getBoardGrid() {
