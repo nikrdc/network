@@ -62,19 +62,24 @@ public class Board {
   //
   // Person in charge: Eric Hum
   public boolean isValidMove(player.Move m, int color) {
-    if (boardGrid[m.x1][m.y1] != 2) { // checks if a chip is already at coordinate
+    if (boardGrid[m.x1][m.y1] != 2) { 
+    // checks if a chip is already at coordinate
       return false;
     }
-    if (m.x1 == 0 || m.x1 == length()-1) { // checks if a chip is in opponent's goals for color 0
-      if (m.y1 == 0 || m.y1 == length()-1) { // checks corners
+    if (m.x1 == 0 || m.x1 == length()-1) { 
+    // checks if a chip is in opponent's goals for color 0
+      if (m.y1 == 0 || m.y1 == length()-1) { 
+      // checks corners
         return false;
       }
       if (color == 0) {
         return false;
       }
     }
-    if (m.y1 == 0 || m.y1 == length()-1) { // checks if a chip is in opponent's goals for color 1
-      if (m.x1 == 0 || m.x1 == length()-1) { // checks corners
+    if (m.y1 == 0 || m.y1 == length()-1) { 
+    // checks if a chip is in opponent's goals for color 1
+      if (m.x1 == 0 || m.x1 == length()-1) { 
+      // checks corners
         return false;
       }
       if (color == 1) {
@@ -83,25 +88,32 @@ public class Board {
     }
     if (m.moveKind == player.Move.ADD) {
       int neighbors = this.neighbors(m.x1, m.y1, color);
-      if (neighbors > 1) { // checks if has two or more neighbors of the same color, or neighbors' neighbors
+      if (neighbors > 1) { 
+      // checks if has two or more neighbors of the same color or neighbors' 
+      // neighbors
         return false;
       }
-      if (getNumChips(color) >= 10) { // checks if less than 10 chips of color on board
+      if (getNumChips(color) >= 10) { 
+      // checks if less than 10 chips of color on board
         return false;
       }
     }
     if (m.moveKind == player.Move.STEP) {
-      if (boardGrid[m.x2][m.y2] == 2 || boardGrid[m.x2][m.y2] != color) { // checks if attempting step move with chip of different color or empty spot
+      if (boardGrid[m.x2][m.y2] == 2 || boardGrid[m.x2][m.y2] != color) { 
+      // checks if attempting step move with chip of different color or empty spot
         return false;
       }
       int tempRemoveChip = boardGrid[m.x2][m.y2];
       boardGrid[m.x2][m.y2] = 2;
       int neighbors = this.neighbors(m.x1, m.y1, color);
       boardGrid[m.x2][m.y2] = tempRemoveChip;
-      if (neighbors > 1) { // checks if has two or more neighors of the same color, or neighbors' neighbors
+      if (neighbors > 1) { 
+      // checks if has two or more neighors of the same color, or neighbors'
+      // neighbors
         return false;
       }
-      if (getNumChips(color) < 10) { // checks if more than or equal to 10 chips of color on board
+      if (getNumChips(color) < 10) { 
+      // checks if more than or equal to 10 chips of color on board
         return false;
       }
     }
@@ -183,7 +195,8 @@ public class Board {
       }
     }
     if (counter == 1 && neighborsList[2][0] == -1) {
-      counter += this.neighborsHelper(neighborsList[1][0], neighborsList[1][1], color, neighborsList);
+      counter += this.neighborsHelper(neighborsList[1][0], neighborsList[1][1], 
+      								  color, neighborsList);
     }
     return counter;
   }
@@ -226,7 +239,8 @@ public class Board {
           for (int t = 0; t < emptySpots.length(); t++) {
             int[] startPosition = (int[]) colorStart.item();
             int[] endPosition = (int[]) emptyEnd.item();
-            Move potentialStep = new Move(endPosition[0], endPosition[1], startPosition[0], startPosition[1]);
+            Move potentialStep = new Move(endPosition[0], endPosition[1], 
+            							  startPosition[0], startPosition[1]);
             if (isValidMove(potentialStep, color)) {
               validMoves.insertBack(potentialStep);
             }
@@ -251,15 +265,17 @@ public class Board {
   }
  
 
-  // Checks to see if "this" board contains a winning network for the "color", as long as
-  // it follows the following rules:
+  // Checks to see if "this" board contains a winning network for the "color", as
+  // long as it follows the following rules:
   //   1. All moves are valid
   //   2. Only 1 Chip in either goal
   //   3. A proper connection from one goal to the other
   //   4. At least 6 chips help form the connection
-  //   5. There are no opponent chips in between a straight line between two chips to break the connection
+  //   5. There are no opponent chips in between a straight line between two chips 
+  //      to break the connection
   //   6. The network does not pass through the same chip twice
-  //   7. A network always passes through each chip while turning a corner (ie changing direction at each chip in network)
+  //   7. A network always passes through each chip while turning a corner (i.e.
+  //      changing direction at each chip in network)
   //
   // Parameters:
   //   color: the color of the player we're searching a winning network for
@@ -280,7 +296,8 @@ public class Board {
           int[][] accum = {{0, i}};
           for (int y = - 1; y <= 1; y++){
             int[] whiteVector = {1, y};
-            boolean result = networkHelp(accum[0], nearestPiece(0, i, 1, y), whiteVector, accum);
+            boolean result = networkHelp(accum[0], nearestPiece(0, i, 1, y), 
+            							 whiteVector, accum);
             if (result == false){
               continue;
             } else {
@@ -295,7 +312,8 @@ public class Board {
           int[][] accum = {{i, 0}};
           for (int x = - 1; x <= 1; x++){
             int[] blackVector = {x, 1};
-            boolean result = networkHelp(accum[0], nearestPiece(i, 0, x, 1), blackVector, accum);
+            boolean result = networkHelp(accum[0], nearestPiece(i, 0, x, 1), 
+            							 blackVector, accum);
             if (result == false){
               continue;
             } else {
@@ -309,15 +327,17 @@ public class Board {
   }
 
 
-  // Helps to see if "this" board contains a winning network for the "color", as long as
-  // it follows the following rules:
+  // Helps to see if "this" board contains a winning network for the "color", as
+  // long as it follows the following rules:
   //
   // Parameters:
   //   int[] prev: the coordinates [x, y] of the last piece visited
   //   int[] curr: the coordinates [x, y] of the current piece being visited
-  //   int[] lastVector: the vector direction [x, y] from which curr was reached from prev
+  //   int[] lastVector: the vector direction [x, y] from which curr was reached 
+  //                     from prev
   //   int[][] accumNetwork: The accumulation of coordinates [x, y]  for each piece
-  //                     already having been visited in the current search (to prevent repeat pieces).
+  //                         already having been visited in the current search (to 
+  //						 prevent repeat pieces).
   // Return Value:
   //   Returns True if there does exist a network for a player on "this" board
   //   Returns False if there is not a network for a player on "this" board
@@ -326,9 +346,11 @@ public class Board {
   //   winningNetwork()
   //
   // Person in charge: Max Eusterbrock
-  private boolean networkHelp(int[] prev, int[] curr, int[] lastVector, int[][] accumNetwork){
+  private boolean networkHelp(int[] prev, int[] curr, int[] lastVector, 
+  							  int[][] accumNetwork){
 
-    if (curr == null){ // Piece is off the board so the network terminates
+    if (curr == null) { 
+    // Piece is off the board so the network terminates
       return false;
     }  
 
@@ -338,47 +360,61 @@ public class Board {
     int currY = curr[1];
     int prevColor = boardGrid[prevX][prevY];
 
-    for(int[] each: accumNetwork){
-      if (arrayEquals(each, curr)){ // Piece has already been visited in current search, so network terminates
+    for(int[] each: accumNetwork) {
+      if (arrayEquals(each, curr)) { 
+      // Piece has already been visited in current search, so network terminates
         return false;
       }
     }
 
-    if (boardGrid[prevX][prevY] != boardGrid[currX][currY]){ // This piece is a different color so network terminates
+    if (boardGrid[prevX][prevY] != boardGrid[currX][currY]) { 
+    // This piece is a different color so network terminates
       return false;
 
     } else {
-      int[][] currAccum = new int[accumNetwork.length + 1][2]; // creates new array to extend the network by the newest piece
-      for (int i = 0; i < accumNetwork.length; i++){ // sets old network equal to new network with intention of adding the newest piece
+      int[][] currAccum = new int[accumNetwork.length + 1][2]; 
+      // creates new array to extend the network by the newest piece
+      for (int i = 0; i < accumNetwork.length; i++) { 
+      // sets old network equal to new network with intention of adding the newest 
+      // piece
         currAccum[i] = accumNetwork[i];
       }
-      currAccum[currAccum.length - 1] = curr; //sets last element as the newest piece
-      if (currX == 7 || currY == 7){ // newest piece in goal area
-        if (currAccum.length >= 6){ // network of 6 or more pieces
+      currAccum[currAccum.length - 1] = curr; 
+      //sets last element as the newest piece
+      if (currX == 7 || currY == 7) { 
+      // newest piece in goal area
+        if (currAccum.length >= 6) { 
+        // network of 6 or more pieces
           return true;
-        } else { // length < 6 so traversal terminates
+        } else { 
+        // length < 6 so traversal terminates
           return false;
         }
 
       } else {
         int lastX = lastVector[0];
         int lastY = lastVector[1];
-        for (int x = -1; x <= 1; x++){
-          for (int y = -1; y <= 1; y++){ // traversing in all 8 directions
-            if (x == lastX && y == lastY){ // ensures a corner is turned
+        for (int x = -1; x <= 1; x++) {
+          for (int y = -1; y <= 1; y++) { 
+          // traversing in all 8 directions
+            if (x == lastX && y == lastY) { 
+            // ensures a corner is turned
               continue;
-            } else if (-x == lastX && -y == lastY){ // ensures traversal doesn't return to previous piece
+            } else if (-x == lastX && -y == lastY) { 
+            // ensures traversal doesn't return to previous piece
               continue;
-            } else if (x == 0 && y == 0){ // ensures traversal moves off current piece
+            } else if (x == 0 && y == 0) { 
+            // ensures traversal moves off current piece
               continue;
             } else {
               int[] next = nearestPiece(currX, currY, x, y);
               int[] currVector = {x, y};
-              if (next == null){ // traversal falls off board
+              if (next == null) { 
+              // traversal falls off board
                 continue;
               } else {
                 boolean result = networkHelp(curr, next, currVector, currAccum);
-                if (result == false){
+                if (result == false) {
                   continue;
                 } else {
                   return true;
@@ -411,15 +447,18 @@ public class Board {
   //   numLinks()
   //
   // Person in charge: Max Eusterbrock
-  private int[] nearestPiece(int x, int y, int i, int j){
+  private int[] nearestPiece(int x, int y, int i, int j) {
     int k = x + i;
     int l = y + j;
-    if(k > 7 || l > 7 || k < 0 || l < 0){ // traversed off the board
+    if(k > 7 || l > 7 || k < 0 || l < 0) { 
+    // traversed off the board
       return null;
-    } else if (boardGrid[k][l] != 2){ // returns found piece coordinate if square not empty
+    } else if (boardGrid[k][l] != 2) { 
+    // returns found piece coordinate if square not empty
       int[] coords = {k, l};
       return coords;
-    } else { // if square empty, keeps traversing
+    } else { 
+    // if square empty, keeps traversing
       return nearestPiece(k, l, i, j);
     }
   }
@@ -433,18 +472,19 @@ public class Board {
   // 
   // Return Value:
   //   Returns a boolean value
-  //   Returns true if the contents of the array are the equivalent, false if they are not.
+  //   Returns true if the contents of the array are the equivalent, false if they 
+  //   are not.
   //
   // Other methods that rely on this method:
   //   networkHelp()
   //
   // Person in charge: Max Eusterbrock
   private boolean arrayEquals(int[] one, int[] two){
-    if (one.length != two.length){
+    if (one.length != two.length) {
       return false;
     } else {
-      for (int i = 0; i < one.length; i++){
-        if (one[i] != two[i]){
+      for (int i = 0; i < one.length; i++) {
+        if (one[i] != two[i]) {
           return false;
         }
       }
@@ -452,6 +492,7 @@ public class Board {
     }
   }
   
+
   // Creates a score for a given "color" based on "this" board
   //
   // Parameters:
@@ -466,12 +507,14 @@ public class Board {
   // Person in charge: Nikhil Rajpal
   public int evaluator(int color) {
     int score = 0;
-    if (winningNetwork(color)) { // winning board is worth 100 points
+    if (winningNetwork(color)) { 
+    // a winning board is worth 100 points
       score = 100;
     } else if (winningNetwork(Math.abs(color-1))) { 
       score = -100;
     } else {
-      score = (numLinks(color) * 10) - (numLinks(Math.abs(color-1)) * 10); // each link worth 10 points
+      score = (numLinks(color) * 10) - (numLinks(Math.abs(color-1)) * 10); 
+      // each connection is worth 10 points
       boolean firstGoal = false;
       boolean secondGoal = false;
       if (color == 0) {
@@ -549,7 +592,8 @@ public class Board {
     } catch (InvalidNodeException e) {
       System.out.println(e + " at numLinks");
     }
-    links /= 2; // account for duplicate links
+    links /= 2; 
+    // account for duplicate links
     return links;
   }
   
