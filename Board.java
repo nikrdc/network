@@ -157,6 +157,19 @@ public class Board {
  
 
   // Finds the number neighbors, and the neighbors neighbors
+  //
+  // Parameters:
+  //    x: the x-coordinate of the chip
+  //    y: the y-coordinate of the chip
+  //    color: the color of the chip
+  //
+  // Return Value:
+  //    The number of neighbors and the neighbors neighbors of the chip
+  //
+  // Other methods that rely on this method:
+  //    isValidMove()
+  //
+  // Person in charge: Eric Hum
   public int neighbors(int x, int y, int color) {
     int[][] list = new int[3][2];
     list[0][0] = x;
@@ -170,6 +183,20 @@ public class Board {
  
 
   // Aids in the neighbors search
+  // Parameters:
+  //    x: the x-coordinate of the chip
+  //    y: the y-coordinate of the chip
+  //    color: the color of the chip
+  //    neighborsList: a list of neighbors already counted
+  //
+  // Return Value:
+  //    The number of neighbors and the neighbors neighbors of the chip
+  //
+  // Other methods that rely on this method:
+  //    isValidMove()
+  //    neighbors()
+  //
+  // Person in charge: Eric Hum
   private int neighborsHelper(int x, int y, int color, int[][] neighborsList) {
     int counter = 0;
     for (int w = x-1; w <= x+1; w++) {
@@ -251,7 +278,7 @@ public class Board {
       } else {
         for (int i = 0; i < length; i++) {
           for (int j = 0; j < length; j++) {
-            Move potentialAdd = new Move(j, i);
+            Move potentialAdd = new Move(i, j);
             if (isValidMove(potentialAdd, color)) {
               validMoves.insertBack(potentialAdd);
             }
@@ -507,13 +534,14 @@ public class Board {
   // Person in charge: Nikhil Rajpal
   public int evaluator(int color) {
     int score = 0;
-    if (winningNetwork(color)) { 
+    if (winningNetwork(Math.abs(color-1))) {
+    // any case in which the opponent has a network is -100 points  
+      score = -100;
+    } else if (winningNetwork(color)) { 
     // a winning board is worth 100 points
       score = 100;
-    } else if (winningNetwork(Math.abs(color-1))) { 
-      score = -100;
     } else {
-      score = (numLinks(color) * 10) - (numLinks(Math.abs(color-1)) * 10); 
+      score = (numLinks(color) * 1) - (numLinks(Math.abs(color-1)) * 1); 
       // each connection is worth 10 points
       boolean firstGoal = false;
       boolean secondGoal = false;
@@ -539,7 +567,7 @@ public class Board {
       if (firstGoal) {
         score += 5;
       } if (secondGoal) {
-        score += 5;
+        score += 2;
       }
     }
     return score;
@@ -598,21 +626,53 @@ public class Board {
   }
   
 
+  // Gets the boardGrid
   public int[][] getBoardGrid() {
     return boardGrid;
   }
   
 
+  // Places the chip onto the board
+  //
+  // Parameters:
+  //    move: the move that places the chip on the boardGrid
+  //    color: the color of the chip
+  //
+  // Return Value:
+  //    none
+  //    changes the boardGrid
+  //
+  // Other methods that rely on this method:
+  //    isValidMove()
+  //    minimax()
+  //
+  // Person in Charge: Eric Hum
   public void setBoardGrid(player.Move move, int color) {
-    if (move.moveKind == player.Move.STEP) {
-      boardGrid[move.x2][move.y2] = 2;
-      setNumChips(color, "-");
+    if (move != null) {
+      if (move.moveKind == player.Move.STEP) {
+        boardGrid[move.x2][move.y2] = 2;
+        setNumChips(color, "-");
+      }
+      boardGrid[move.x1][move.y1] = color;
+      setNumChips(color, "+");
     }
-    boardGrid[move.x1][move.y1] = color;
-    setNumChips(color, "+");
   }
   
 
+  // Removes the chip onto the board
+  //
+  // Parameters:
+  //    move: the move that places the chip on the boardGrid
+  //    color: the color of the chip
+  //
+  // Return Value:
+  //    none
+  //    changes the boardGrid
+  //
+  // Other methods that rely on this method:
+  //    minimax()
+  //
+  // Person in Charge: Eric Hum
   public void undoMove(player.Move move, int color) {
     if (boardGrid[move.x1][move.y1] == color) {
       if (move.moveKind == player.Move.STEP) {
@@ -625,11 +685,13 @@ public class Board {
   }
   
 
+  // Finds the length of the boardGrid
   public int length() {
     return length;
   }
   
 
+  // Returns a table of the boardGrid
   public String toString() {
     String s = "";
     for (int i = 0; i <= (length()-1); i++) {
@@ -645,11 +707,6 @@ public class Board {
     return s;
   }
 
-
-  public int[] directConnections() {
-    return new int[1];
-  }
-    
   
   public static void main(String[] args) {
     // Testing isValidMove()
@@ -1018,6 +1075,30 @@ public class Board {
     System.out.println("Board below should be different than board above");
     testBoard1.undoMove(testMove2, 1);
     System.out.println(testBoard1);
+    
+    // Testing isValidMove() for add move
+    System.out.println("Testing isValidMove() due to problem in SearchTree");
+    testBoard1 = new Board();
+    testMove1 = new player.Move(1, 0);
+    if (testBoard1.isValidMove(testMove1, 0)) {
+      testBoard1.setBoardGrid(testMove1, 0);
+    }
+    testMove1 = new player.Move(2, 1);
+    if (testBoard1.isValidMove(testMove1, 1)) {
+      testBoard1.setBoardGrid(testMove1, 1);
+    }
+    System.out.println(testBoard1);
+    testMove1 = new player.Move(1, 1);
+    if (testBoard1.isValidMove(testMove1, 1)) {
+      testBoard1.setBoardGrid(testMove1, 1);
+    }
+    System.out.println(testBoard1);
+    testMove1 = new player.Move(3, 1);
+    if (testBoard1.isValidMove(testMove1, 1)) {
+      testBoard1.setBoardGrid(testMove1, 1);
+    }
+    System.out.println(testBoard1);
+    
 
     System.out.println("#################################\nTesting winningNetwork(), nearestPiece()\n#################################\n");
     Board testBoard1w = new Board();
