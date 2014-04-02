@@ -20,8 +20,12 @@ instructor.
 ===============================================================================
 Does your program compile without errors?
 
+Yes
+
 
 Have you tested your program on the 61B lab machines?
+
+Yes
 
 
 Did you successfully implement game tree search?  Did you successfully
@@ -29,15 +33,28 @@ implement alpha-beta pruning?  Are there any limitations on it?  What is the
 default number of search levels set by the one-parameter MachinePlayer
 constructor (or is it a variable-depth search)?
 
+Yes, Yes, no limitations, 3
+
 
 Describe your board evaluation function in some detail.
 
+The evaluation function works as follows:
+  1. Checks to see if the opponent has a winning network with the winningNetwork method. Any scenario in which an opponent has a winning scenario means the player has lost. -100 points are assigned if the opponent has a winning network.
+  2. Checks to see if current player has a winning network. The current player can only win with a winning network if the opponent does not have one too. Thus this check comes after the previous one. 100 points are assigned if the current player has a winning network.
+  3. If neither of the above are true, the function:
+     - Checks how many connections there are for the player and his opponent, and subtracts the number of connections the player has from the number of connections the opponent has. Each connection is worth 1 point.
+     - Checks to see if the player has a chip in both of the relevant goals. If the player has a chip in both goals, 5 points are assigned. If the player only has a chip in one goal, 2 points are assigned.
+  4. Returns the score as determined by the checks above. 
+  
 
 Does your MachinePlayer use any special method of choosing the first few moves?
+
+no
 
 
 Is there anything else the graders should know to help them read your project?
 
+nope
 
 
 Describe the classes, modules, and interfaces you designed before and while you
@@ -63,48 +80,104 @@ sure to modify this file to reflect these changes before you submit your
 project.  Your design of classes and interfaces will be worth 10% of your
 grade.
 
-Classes
-Board.java
-Chip.java
-SearchTree.java
+Classes:
+  Board.java
+  SearchTree.java
+  MyBest.java
 
-Modules
+Modules:
+
 Networking module - Max
 Board.java
-Board.winningNetwork()
-Chip.java
-Chip.directConnections()
 
-Evaluation Function module - Nik
-Board.java
-Board.evaluator()
-Board.validMoveList()
-
-Minimax module - Eric
-SearchTree.java
-SearchTree.minimax()
-Board.java
-Board.isValidMove()
-Chip.java
-Chip.neighbors()
-
-/* Board.java */
-
-/**
- * Implementation of the Board that a player is playing on.
- *
- **/
-
-public class Board {
-
-  private Player me;
-  private Player opponent;
-  private Chip[][] boardGrid;
+  // Checks to see if "this" board contains a winning network for the "color", as
+  // long as it follows the following rules:
+  //   1. All moves are valid
+  //   2. Only 1 Chip in either goal
+  //   3. A proper connection from one goal to the other
+  //   4. At least 6 chips help form the connection
+  //   5. There are no opponent chips in between a straight line between two chips 
+  //      to break the connection
+  //   6. The network does not pass through the same chip twice
+  //   7. A network always passes through each chip while turning a corner (i.e.
+  //      changing direction at each chip in network)
+  //
+  // Parameters:
+  //   color: the color of the player we're searching a winning network for
+  //
+  // Return Value:
+  //   Returns True if there does exist a network for a player on "this" board
+  //   Returns False if there is not a network for a player on "this" board
+  //
+  // Other methods that rely on this method:
+  //   evaluator()
+  //   minimax()
+  //
+  // Person in charge: Max Eusterbrock
+  public boolean winningNetwork(int color)
   
-  // Board constructor
-  public Board() {
-    boardGrid = new Chip[8][8];
-  }
+  // Helps to see if "this" board contains a winning network for the "color", as
+  // long as it follows the following rules:
+  //
+  // Parameters:
+  //   int[] prev: the coordinates [x, y] of the last piece visited
+  //   int[] curr: the coordinates [x, y] of the current piece being visited
+  //   int[] lastVector: the vector direction [x, y] from which curr was reached 
+  //                     from prev
+  //   int[][] accumNetwork: The accumulation of coordinates [x, y]  for each piece
+  //                         already having been visited in the current search (to 
+  //						 prevent repeat pieces).
+  // Return Value:
+  //   Returns True if there does exist a network for a player on "this" board
+  //   Returns False if there is not a network for a player on "this" board
+  //
+  // Other methods that rely on this method:
+  //   winningNetwork()
+  //
+  // Person in charge: Max Eusterbrock
+  private boolean networkHelp(int[] prev, int[] curr, int[] lastVector, 
+  							  int[][] accumNetwork)
+                              
+  // Checks to see where the nearest piece in relation to a piece is.
+  //
+  // Parameters:
+  //   x: the x coordinate of the intended piece
+  //   y: the y coordinate of the inteded piece
+  //   i: the x vector direction to traverse
+  //   j: the y vector direction to traverse
+  //
+  // Return Value:
+  //   Returns an int array of the X,Y coordinates of the nearest piece
+  //   Returns null if no piece, or invalid inputs.
+  //
+  // Other methods that rely on this method:
+  //   winningNetwork()
+  //   networkHelp()
+  //   numLinks()
+  //
+  // Person in charge: Max Eusterbrock
+  private int[] nearestPiece(int x, int y, int i, int j)
+  
+  // Checks to see whether or not two integer arrays contain the same elements.
+  //
+  // Parameters:
+  //   int[] one: the first array to be compared
+  //   int[] two: the the second array to be compared
+  // 
+  // Return Value:
+  //   Returns a boolean value
+  //   Returns true if the contents of the array are the equivalent, false if they 
+  //   are not.
+  //
+  // Other methods that rely on this method:
+  //   networkHelp()
+  //
+  // Person in charge: Max Eusterbrock
+  private boolean arrayEquals(int[] one, int[] two)
+  
+  
+Valid Move module - Eric and Nik
+Board.java
 
   // Checks if Move m is valid with regards to "this" board.
   // Rules go as follow:
@@ -127,102 +200,174 @@ public class Board {
   //   MachinePlayer.opponentMove()
   //   MachinePlayer.forceMove()
   //
+  // Methods used:
+  //   getNumChips()
+  //   setNumChips()
+  //   neighbors()
+  //   neighborsHelper()
+  //
   // Person in charge: Eric Hum
-  public boolean isValidMove(Move m, int color) {
-  }
-
+  public boolean isValidMove(player.Move m, int color)
   
-  // Creates a list of all x and y coordinates that are open to valid moves
+  // Gets the number of chips on the board for a particular color
+  //
+  // Parameter:
+  //    color: the color we're counting the number of chips for
+  //
+  // Return Value:
+  //    The number of chips for the asked for color on this board
+  private int getNumChips(int color)
+  
+  // Sets the number of chips on the board for a particular color
+  //
+  // Parameter:
+  //    color: the color we're trying to increase or decrease the number of chips for
+  //    op: a string that indicates whether or not we're increasing or decreasing the number of chips
+  //
+  // Return Value:
+  //    None, just changes a field
+  private void setNumChips(int color, String op)
+  
+  // Finds the number neighbors, and the neighbors neighbors
+  //
+  // Parameters:
+  //    x: the x-coordinate of the chip
+  //    y: the y-coordinate of the chip
+  //    color: the color of the chip
+  //
+  // Return Value:
+  //    The number of neighbors and the neighbors neighbors of the chip
+  //
+  // Other methods that rely on this method:
+  //    isValidMove()
+  //
+  // Person in charge: Eric Hum
+  private int neighbors(int x, int y, int color)
+  
+  // Aids in the neighbors search
+  // Parameters:
+  //    x: the x-coordinate of the chip
+  //    y: the y-coordinate of the chip
+  //    color: the color of the chip
+  //    neighborsList: a list of neighbors already counted
+  //
+  // Return Value:
+  //    The number of neighbors and the neighbors neighbors of the chip
+  //
+  // Other methods that rely on this method:
+  //    isValidMove()
+  //    neighbors()
+  //
+  // Person in charge: Eric Hum
+  private int neighborsHelper(int x, int y, int color, int[][] neighborsList)
+  
+  // Creates a list of all valid moves
   //
   // Parameters:
   //   color: the color of the player we're searching a list of valid moves for
   //
   // Return Value:
-  //   An array of all possible Moves
+  //   A DList of all valid Moves
   //
   // Other methods that rely on this method:
-  //    minimax.minimax()
-  //    evaluator()
+  //   minimax.minimax()
+  //   evaluator()
   //
   // Person in charge: Nikhil Rajpal
-  public Move[] validMoveList(int color) {
-  }
+  public DList validMoveList(int color)
   
-  // Checks to see if "this" board contains a winning network for the "color", as long as
-  // it follows the following rules:
-  //    1. All moves are valid
-  //    2. Only 1 Chip in either goal
-  //    3. A proper connection from one goal to the other
-  //    4. At least 6 chips help form the connection
-  //    5. There are no opponent chips in between a straight line between two chips to break the connection
-  //    6. The network does not pass through the same chip twice
-  //    7. A network always passes through each chip while turning a corner (ie changing direction at each chip in network)
+  
+List Module - Nik
+DList.java
+List.java
+DListNode.java
+DList.java
+
+  /**
+   *  insertAfter() inserts an item immediately following this node.  If this
+   *  node is invalid, throws an exception.
+   *
+   *  @param item the item to be inserted.
+   *  @exception InvalidNodeException if this node is not valid.
+   *
+   *  Performance:  runs in O(1) time.
+   */
+  public void insertAfter(Object item)
+  
+  /**
+   *  isValidNode returns true if this node is valid; false otherwise.
+   *  An invalid node is represented by a `myList' field with the value null.
+   *  Sentinel nodes are invalid, and nodes that don't belong to a list are
+   *  also invalid.
+   *
+   *  @return true if this node is valid; false otherwise.
+   *
+   *  Performance:  runs in O(1) time.
+   */
+  public boolean isValidNode()
+  
+  /**
+   *  next() returns the node following this node.  If this node is invalid,
+   *  throws an exception.
+   *
+   *  @return the node following this node.
+   *  @exception InvalidNodeException if this node is not valid.
+   *
+   *  Performance:  runs in O(1) time.
+   */
+  public ListNode next()
+  
+
+Evaluation Function module - Nik
+Board.java
+
+  // Creates a list of all valid moves
   //
   // Parameters:
-  //    color: the color of the player we're searching a winning network for
+  //   color: the color of the player we're searching a list of valid moves for
   //
   // Return Value:
-  //    Returns True if there does exist a network for a player on "this" board
-  //    Returns False if there is not a network for a player on "this" board
+  //   A DList of all valid Moves
   //
   // Other methods that rely on this method:
-  //    evaluator()
-  //    minimax()
-  public boolean winningNetwork(int color) {
-  }
+  //   minimax.minimax()
+  //   evaluator()
+  //
+  // Person in charge: Nikhil Rajpal
+  public DList validMoveList(int color)
   
   // Creates a score for a given "color" based on "this" board
   //
   // Parameters:
-  //    color: the color of the player we're evaluating the board for
+  //   color: the color of the player we're evaluating the board for
   //
   // Return Value:
-  //    Returns a score, high score if favorable 
+  //   Returns a score, high score if favorable 
   //
   // Other methods that rely on this method:
-  //    minimax()
-  //    
-  public int evaluator(int color) {
-  }
+  //   minimax()
+  //
+  // Person in charge: Nikhil Rajpal
+  public int evaluator(int color)
   
-}
-
-
-/* Chip.java */
-
-/** An implementation of the chips placed on the board
- *
- *  Person in charge of entire class: Max Eusterbrock
- */
-public class Chip {
-
-  private int x;
-  private int y;
-  private int color;
-  
-  // Returns an array of Chips that are directly next to "this" Chip
-  public Chip(int x, int y, int color) {
-    this.x = x;
-    this.y = y;
-    this.color = color;
-  
-  // Finds the neighbors of "this" chip
+  // Finds the total number of connections between chips of a given color.
   //
   // Parameters:
-  //    none
+  //   color: the color of the player we're finding connections for
   //
   // Return Value:
-  //    An array of Chips that are directly connected to "this" chip. ie, the neighbors
-  //    are directly adjacent to "this" chip.
-  public Chip[] directConnections() {
-  }
+  //   An integer - the number of connections between chips of a given color
+  //
+  // Other methods that rely on this method:
+  //   evaluator()
+  //
+  // Person in charge: Nikhil Rajpal
+  private int numLinks(int color)
   
-}
 
-
-/* SearchTree.java */
-
-public class SearchTree {
+Minimax module - Eric
+SearchTree.java
+MyBest.java
 
   // Does a search tree algorithm that finds the best possible move based on the board and the number of searchDepth
   //
@@ -230,20 +375,96 @@ public class SearchTree {
   //    board: the current board minimax is analyzing
   //    searchDepth: the number of recursions of minimax
   //    color: the player that is currently being minimaxed (either CurrentPlayer or Opponent)
-  //    alpha: the score that the  CurrentPlayer knows with certainty it can achieve
-  //    beta: the score that the Opponent is the worst score the Opponent is guarateed to attain
   //
   // Return Value:
-  //    Returns the Move that is optimal for the CurrentPlayer given the board and the search depth
+  //    Returns an object array with the Move that is optimal for the CurrentPlayer given the board and the search depth, and the score of that move
   //
   // Other methods that rely on this method:
   //    evaluator:
   //
   // Person in charge: Eric Hum
-  public Move minimax(Board board, int searchDepth, int color, int alpha, int beta) {
-  }
+  public MyBest minimax(Board board, int searchDepth, int color)
+  
+  // Helps minimax in performing the search
+  //
+  // Parameters:
+  //    board: the current board minimax is analyzing
+  //    searchDepth: the number of recursions of minimax
+  //    originalColor: the player that was originally being minimaxed (the CurrentPlayer)
+  //    currentColor: the player that is currently being minimaxed (either CurrentPlayer or Opponent)
+  //    alpha: the score that the  CurrentPlayer knows with certainty it can achieve
+  //    beta: the score that the Opponent is the worst score the Opponent is guarateed to attain
+  //
+  // Return Value:
+  //    Returns an object array with the Move that is optimal for the CurrentPlayer given the board and the search depth, and the score of that move
+  //
+  // Other methods that rely on this method:
+  //    evaluator:
+  //
+  // Person in charge: Eric Hum
+  private MyBest minimax_helper(Board board, int searchDepth, int originalColor, int currentColor, int alpha, int beta)
 
-}
-
-
-
+  // MyBest constructor with 3 parameters
+  //
+  // Parameters:
+  //    m: the move of the best possible move
+  //    score1: the score of the best possible move
+  //    sd: the searchDepth of the best possible move
+  //
+  // Return Value:
+  //    a newly constructed MyBest object
+  public MyBest(player.Move m, int score1, int sd)
+  
+  // Gets the move within the MyBest object
+  //
+  // Parameters:
+  //    none
+  //
+  // Return Value:
+  //    the move with the MyBest object
+  public player.Move getMove()
+  
+  // Sets or changes the move within the MyBest object
+  //
+  // Parameters:
+  //    m: the move you want to change the field within the MyBest obejct to
+  //
+  // Return Value:
+  //    none
+  public void setMove(player.Move m)
+  
+  // Gets the score within the MyBest object
+  //
+  // Parameters:
+  //    none
+  //
+  // Return Value:
+  //    the score with the MyBest object
+  public int getScore()
+  
+  // Sets or changes the score within the MyBest object
+  //
+  // Parameters:
+  //    score1: the score you want to change the field within the MyBest obejct to
+  //
+  // Return Value:
+  //    none
+  public void setScore(int score1)
+  
+  // Gets the searchDepth within the MyBest object
+  //
+  // Parameters:
+  //    none
+  //
+  // Return Value:
+  //    the searchDepth with the MyBest object
+  public int getSearchDepth()
+  
+  // Sets or changes the searchDepth within the MyBest object
+  //
+  // Parameters:
+  //    sd: the searchDepth you want to change the field within the MyBest obejct to
+  //
+  // Return Value:
+  //    none
+  public void setSearchDepth(int sd)

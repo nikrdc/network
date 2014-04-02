@@ -1,5 +1,7 @@
 /* Board.java */
 
+package gameboard;
+
 import list.*;
 import player.*;
 
@@ -20,6 +22,11 @@ public class Board {
 
   
   // Board constructor
+  // 
+  // Parameters:
+  //   None
+  // Return Value:
+  //   None
   public Board() {
     boardGrid = new int[LENGTH][LENGTH];
     for (int i = 0; i < LENGTH; i++) {
@@ -63,13 +70,10 @@ public class Board {
   // Person in charge: Eric Hum
   public boolean isValidMove(player.Move m, int color) {
     if (boardGrid[m.x1][m.y1] != 2) { 
-    // checks if a chip is already at coordinate
       return false;
     }
     if (m.x1 == 0 || m.x1 == length()-1) { 
-    // checks if a chip is in opponent's goals for color 0
       if (m.y1 == 0 || m.y1 == length()-1) { 
-      // checks corners
         return false;
       }
       if (color == 0) {
@@ -77,9 +81,7 @@ public class Board {
       }
     }
     if (m.y1 == 0 || m.y1 == length()-1) { 
-    // checks if a chip is in opponent's goals for color 1
       if (m.x1 == 0 || m.x1 == length()-1) { 
-      // checks corners
         return false;
       }
       if (color == 1) {
@@ -89,18 +91,14 @@ public class Board {
     if (m.moveKind == player.Move.ADD) {
       int neighbors = this.neighbors(m.x1, m.y1, color);
       if (neighbors > 1) { 
-      // checks if has two or more neighbors of the same color or neighbors' 
-      // neighbors
         return false;
       }
       if (getNumChips(color) >= 10) { 
-      // checks if less than 10 chips of color on board
         return false;
       }
     }
     if (m.moveKind == player.Move.STEP) {
       if (boardGrid[m.x2][m.y2] == 2 || boardGrid[m.x2][m.y2] != color) { 
-      // checks if attempting step move with chip of different color or empty spot
         return false;
       }
       int tempRemoveChip = boardGrid[m.x2][m.y2];
@@ -108,12 +106,9 @@ public class Board {
       int neighbors = this.neighbors(m.x1, m.y1, color);
       boardGrid[m.x2][m.y2] = tempRemoveChip;
       if (neighbors > 1) { 
-      // checks if has two or more neighors of the same color, or neighbors'
-      // neighbors
         return false;
       }
       if (getNumChips(color) < 10) { 
-      // checks if more than or equal to 10 chips of color on board
         return false;
       }
     }
@@ -122,6 +117,12 @@ public class Board {
  
 
   // Gets the number of chips on the board for a particular color
+  //
+  // Parameter:
+  //   color: the color we're counting the number of chips for
+  //
+  // Return Value:
+  //   The number of chips for the asked for color on this board
   private int getNumChips(int color) {
     if (color == 0) {
       return num0;
@@ -134,6 +135,14 @@ public class Board {
  
 
   // Sets the number of chips on the board for a particular color
+  //
+  // Parameter:
+  //   color: the color we're trying to increase or decrease the number of chips
+  //   for
+  //   op: a string that indicates whether or not we're increasing or decreasing the number of chips
+  //
+  // Return Vlaue:
+  //   None, just changes a field
   private void setNumChips(int color, String op) {
     if (color == 0) {
       if (op == "+") {
@@ -159,18 +168,18 @@ public class Board {
   // Finds the number neighbors, and the neighbors neighbors
   //
   // Parameters:
-  //    x: the x-coordinate of the chip
-  //    y: the y-coordinate of the chip
-  //    color: the color of the chip
+  //   x: the x-coordinate of the chip
+  //   y: the y-coordinate of the chip
+  //   color: the color of the chip
   //
   // Return Value:
-  //    The number of neighbors and the neighbors neighbors of the chip
+  //   The number of neighbors and the neighbors neighbors of the chip
   //
   // Other methods that rely on this method:
-  //    isValidMove()
+  //   isValidMove()
   //
   // Person in charge: Eric Hum
-  public int neighbors(int x, int y, int color) {
+  private int neighbors(int x, int y, int color) {
     int[][] list = new int[3][2];
     list[0][0] = x;
     list[0][1] = y;
@@ -184,17 +193,17 @@ public class Board {
 
   // Aids in the neighbors search
   // Parameters:
-  //    x: the x-coordinate of the chip
-  //    y: the y-coordinate of the chip
-  //    color: the color of the chip
-  //    neighborsList: a list of neighbors already counted
+  //   x: the x-coordinate of the chip
+  //   y: the y-coordinate of the chip
+  //   color: the color of the chip
+  //   neighborsList: a list of neighbors already counted
   //
   // Return Value:
-  //    The number of neighbors and the neighbors neighbors of the chip
+  //   The number of neighbors and the neighbors neighbors of the chip
   //
   // Other methods that rely on this method:
-  //    isValidMove()
-  //    neighbors()
+  //   isValidMove()
+  //   neighbors()
   //
   // Person in charge: Eric Hum
   private int neighborsHelper(int x, int y, int color, int[][] neighborsList) {
@@ -397,6 +406,12 @@ public class Board {
     if (boardGrid[prevX][prevY] != boardGrid[currX][currY]) { 
     // This piece is a different color so network terminates
       return false;
+    }
+    if (currX == 0 || currY == 0){
+    //2nd piece in start goal area
+      return false;
+    
+
 
     } else {
       int[][] currAccum = new int[accumNetwork.length + 1][2]; 
@@ -541,8 +556,8 @@ public class Board {
     // a winning board is worth 100 points
       score = 100;
     } else {
-      score = (numLinks(color) * 1) - (numLinks(Math.abs(color-1)) * 1); 
-      // each connection is worth 10 points
+      score = numLinks(color) - numLinks(Math.abs(color-1); 
+      // each connection is worth 1 point
       boolean firstGoal = false;
       boolean secondGoal = false;
       if (color == 0) {
@@ -564,9 +579,9 @@ public class Board {
           }
         }       
       }
-      if (firstGoal) {
+      if ((firstGoal) && (secondGoal)) {
         score += 5;
-      } if (secondGoal) {
+      } else if ((firstGoal) || (secondGoal)) {
         score += 2;
       }
     }
@@ -633,6 +648,7 @@ public class Board {
   
 
   // Places the chip onto the board
+  // In other words, it changes the internal boardGrid
   //
   // Parameters:
   //    move: the move that places the chip on the boardGrid
@@ -659,7 +675,7 @@ public class Board {
   }
   
 
-  // Removes the chip onto the board
+  // Removes the chip from the board
   //
   // Parameters:
   //    move: the move that places the chip on the boardGrid
@@ -686,12 +702,14 @@ public class Board {
   
 
   // Finds the length of the boardGrid
+  // For the case of Network, it should be the same as LENGTH, which is set at 8
   public int length() {
     return length;
   }
   
 
   // Returns a table of the boardGrid
+  // Used for debugging
   public String toString() {
     String s = "";
     for (int i = 0; i <= (length()-1); i++) {
